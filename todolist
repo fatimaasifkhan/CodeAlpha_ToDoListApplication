@@ -1,0 +1,110 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Task {
+    string description;
+    bool completed;
+
+    Task(const string& desc = "") : description(desc), completed(false) {}
+};
+void displayMenu() {
+    cout << "\nTo-Do List Application\n";
+    cout << "1. Add Task\n";
+    cout << "2. Mark Task as Completed\n";
+    cout << "3. View Tasks\n";
+    cout << "4. Exit\n";
+    cout << "Enter your choice: ";
+}
+
+void addTask(Task*& tasks, int& taskCount, int& capacity) {
+    if (taskCount == capacity) {
+        resizeArray(tasks, capacity);
+    }
+
+    string description;
+    cout << "Enter task description: ";
+    getline(cin, description);
+    tasks[taskCount++] = Task(description);
+    cout << "Task added successfully.\n";
+}
+
+void markTaskAsCompleted(Task* tasks, int taskCount) {
+    if (taskCount == 0) {
+        cout << "No tasks to mark as completed.\n";
+        return;
+    }
+
+    viewTasks(tasks, taskCount);
+
+    int taskIndex;
+    cout << "Enter the task number to mark as completed: ";
+    cin >> taskIndex;
+    cin.ignore(); 
+
+    if (taskIndex > 0 && taskIndex <= taskCount) {
+        tasks[taskIndex - 1].completed = true;
+        cout << "Task marked as completed.\n";
+    }
+    else {
+        cout << "Invalid task number.\n";
+    }
+}
+
+void viewTasks(const Task* tasks, int taskCount) {
+    if (taskCount == 0) {
+       cout << "No tasks available.\n";
+        return;
+    }
+
+    cout << "\nCurrent Tasks:\n";
+    for (int i = 0; i < taskCount; ++i) {
+        cout << i + 1 << ". " << tasks[i].description << (tasks[i].completed ? " [Completed]" : "") << "\n";
+    }
+}
+
+void resizeArray(Task*& tasks, int& capacity) {
+    int newCapacity = capacity * 2;
+    Task* newTasks = new Task[newCapacity];
+
+    for (int i = 0; i < capacity; ++i) {
+        newTasks[i] = tasks[i];
+    }
+
+    delete[] tasks;
+    tasks = newTasks;
+    capacity = newCapacity;
+}
+int main() {
+    int capacity = 2;  // Initial capacity of the array
+    int taskCount = 0; // Number of current tasks
+    Task* tasks = new Task[capacity];
+    int choice;
+
+    do {
+        displayMenu();
+        cin >> choice;
+        cin.ignore();
+
+        switch (choice) {
+        case 1:
+            addTask(tasks, taskCount, capacity);
+            break;
+        case 2:
+            markTaskAsCompleted(tasks, taskCount);
+            break;
+        case 3:
+            viewTasks(tasks, taskCount);
+            break;
+        case 4:
+            cout << "Exiting the application.\n";
+            break;
+        default:
+            cout << "Invalid choice. Please try again.\n";
+            break;
+        }
+    } while (choice != 4);
+
+    delete[] tasks; // Free the dynamically allocated memory
+    return 0;
+}
